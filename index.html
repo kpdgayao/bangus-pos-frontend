@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bangus Brent Bazaar</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 400px;
+      width: 100%;
+      padding: 30px;
+    }
+    h1 { 
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      color: #555;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    button:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+    button:active { transform: translateY(0); }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+    }
+    .result.success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; display: block; }
+    .result.error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; display: block; }
+    .price-tag { color: #667eea; font-weight: 700; }
+    .loading { display: none; text-align: center; margin-top: 15px; }
+    .loading.active { display: block; }
+    .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🐟 Bangus Order</h1>
+    <p class="subtitle">Brent Bazaar 2025</p>
+    
+    <form id="orderForm">
+      <label for="item">Select Item</label>
+      <select id="item" required>
+        <option value="">-- Choose your bangus --</option>
+        <option value="Bangus Belly">Bangus Belly - ₱150</option>
+        <option value="Bangus Sisig">Bangus Sisig - ₱120</option>
+        <option value="Grilled Bangus">Grilled Bangus - ₱180</option>
+        <option value="Bangus Lumpia">Bangus Lumpia - ₱100</option>
+      </select>
+      
+      <label for="qty">Quantity</label>
+      <input type="number" id="qty" value="1" min="1" max="20" required>
+      
+      <label for="payment">Payment Method</label>
+      <select id="payment" required>
+        <option value="Cash">💵 Cash</option>
+        <option value="GCash">📱 GCash</option>
+      </select>
+      
+      <label for="customer">Customer Name (optional)</label>
+      <input type="text" id="customer" placeholder="Your name">
+      
+      <button type="submit" id="submitBtn">Place Order</button>
+    </form>
+    
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+    </div>
+    
+    <div id="result" class="result"></div>
+  </div>
+  
+  <script>
+    const WEBHOOK_URL = 'PASTE_YOUR_N8N_WEBHOOK_URL_HERE';
+    
+    document.getElementById('orderForm').onsubmit = async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const loading = document.getElementById('loading');
+      const result = document.getElementById('result');
+      
+      submitBtn.disabled = true;
+      loading.classList.add('active');
+      result.style.display = 'none';
+      
+      const data = {
+        item: document.getElementById('item').value,
+        quantity: parseInt(document.getElementById('qty').value),
+        payment: document.getElementById('payment').value,
+        customer: document.getElementById('customer').value || 'Walk-in'
+      };
+      
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) throw new Error('Network error');
+        
+        const responseData = await response.json();
+        
+        result.className = 'result success';
+        result.innerHTML = `
+          ✅ <strong>Order Confirmed!</strong><br>
+          Order #${responseData.orderNumber}<br>
+          Total: ₱${responseData.total}
+        `;
+        
+        document.getElementById('orderForm').reset();
+        
+      } catch (error) {
+        result.className = 'result error';
+        result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
+      } finally {
+        submitBtn.disabled = false;
+        loading.classList.remove('active');
+      }
+    };
+  </script>
+</body>
+</html>
