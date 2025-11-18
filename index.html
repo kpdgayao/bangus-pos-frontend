@@ -65,14 +65,6 @@
       border-color: #667eea;
       box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
     }
-    .qty-input {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .qty-input input {
-      flex: 1;
-    }
     
     .add-btn {
       width: 100%;
@@ -214,6 +206,94 @@
     .submit-btn:active { transform: translateY(0); }
     .submit-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
     
+    /* Confirmation Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .modal-header h2 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .order-number {
+      background: #667eea;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      display: inline-block;
+    }
+    .modal-body {
+      margin: 20px 0;
+    }
+    .confirm-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .confirm-total {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .confirm-total-amount {
+      font-size: 28px;
+      font-weight: 700;
+      color: #667eea;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .btn-cancel {
+      background: #6c757d;
+      color: white;
+    }
+    .btn-cancel:hover { background: #5a6268; }
+    .btn-confirm {
+      background: #28a745;
+      color: white;
+    }
+    .btn-confirm:hover { background: #218838; }
+    .btn-confirm:disabled { background: #ccc; cursor: not-allowed; }
+    
     .result {
       margin-top: 20px;
       padding: 15px;
@@ -287,7 +367,7 @@
       <label for="customer">Customer Name (optional)</label>
       <input type="text" id="customer" placeholder="Your name">
       
-      <button class="submit-btn" id="submitBtn" onclick="submitOrder()" disabled>
+      <button class="submit-btn" id="submitBtn" onclick="showConfirmation()" disabled>
         🚀 Place Order
       </button>
     </div>
@@ -299,10 +379,36 @@
     <div id="result" class="result"></div>
   </div>
   
+  <!-- Confirmation Modal -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Confirm Order</h2>
+        <div class="order-number" id="previewOrderNumber">BB0001</div>
+      </div>
+      <div class="modal-body">
+        <div id="confirmItems"></div>
+        <div class="confirm-total">
+          <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Total Amount</div>
+          <div class="confirm-total-amount">₱<span id="confirmTotal">0</span></div>
+        </div>
+        <div style="margin-top: 15px; text-align: center;">
+          <div style="color: #666; font-size: 13px;">Payment: <strong id="confirmPayment"></strong></div>
+          <div style="color: #666; font-size: 13px;">Customer: <strong id="confirmCustomer"></strong></div>
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn btn-cancel" onclick="closeConfirmation()">Cancel</button>
+        <button class="modal-btn btn-confirm" id="confirmBtn" onclick="submitOrder()">Confirm Order</button>
+      </div>
+    </div>
+  </div>
+  
   <script>
     const WEBHOOK_URL = 'https://n8n-production-211f.up.railway.app/webhook/bangus-order';
     
     let cart = [];
+    let nextOrderNumber = 1; // Will be loaded from localStorage
     
     // Menu prices lookup
     const menuPrices = {
@@ -317,6 +423,26 @@
       'Shanghai Bites (6 pcs, no rice)': 85,
       'Shanghai Dozen (12 pcs, no rice)': 150
     };
+    
+    // Load order counter from localStorage
+    function loadOrderCounter() {
+      const saved = localStorage.getItem('bangusOrderCounter');
+      if (saved) {
+        nextOrderNumber = parseInt(saved);
+      } else {
+        nextOrderNumber = 1;
+      }
+    }
+    
+    function getNextOrderNumber() {
+      const orderNum = 'BB' + String(nextOrderNumber).padStart(4, '0');
+      return orderNum;
+    }
+    
+    function incrementOrderCounter() {
+      nextOrderNumber++;
+      localStorage.setItem('bangusOrderCounter', nextOrderNumber);
+    }
     
     function addToCart() {
       const itemSelect = document.getElementById('item');
@@ -415,19 +541,54 @@
       submitBtn.disabled = false;
     }
     
-    async function submitOrder() {
+    function showConfirmation() {
       if (cart.length === 0) {
         alert('Cart is empty!');
         return;
       }
       
-      const submitBtn = document.getElementById('submitBtn');
+      const modal = document.getElementById('confirmModal');
+      const confirmItems = document.getElementById('confirmItems');
+      const confirmTotal = document.getElementById('confirmTotal');
+      const confirmPayment = document.getElementById('confirmPayment');
+      const confirmCustomer = document.getElementById('confirmCustomer');
+      const previewOrderNumber = document.getElementById('previewOrderNumber');
+      
+      // Calculate total
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      // Generate preview order number
+      previewOrderNumber.textContent = getNextOrderNumber();
+      
+      // Render items
+      confirmItems.innerHTML = cart.map(item => `
+        <div class="confirm-item">
+          <div>
+            <div style="font-weight: 600;">${item.item}</div>
+            <div style="font-size: 13px; color: #666;">₱${item.price} × ${item.quantity}</div>
+          </div>
+          <div style="font-weight: 700;">₱${item.price * item.quantity}</div>
+        </div>
+      `).join('');
+      
+      confirmTotal.textContent = total.toFixed(0);
+      confirmPayment.textContent = document.getElementById('payment').value;
+      confirmCustomer.textContent = document.getElementById('customer').value || 'Walk-in';
+      
+      modal.classList.add('active');
+    }
+    
+    function closeConfirmation() {
+      document.getElementById('confirmModal').classList.remove('active');
+    }
+    
+    async function submitOrder() {
+      const confirmBtn = document.getElementById('confirmBtn');
       const loading = document.getElementById('loading');
       const result = document.getElementById('result');
       
-      submitBtn.disabled = true;
-      loading.classList.add('active');
-      result.style.display = 'none';
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing...';
       
       const data = {
         items: cart.map(item => ({
@@ -449,6 +610,12 @@
         
         const responseData = await response.json();
         
+        // Close modal
+        closeConfirmation();
+        
+        // Increment order counter for next order
+        incrementOrderCounter();
+        
         result.className = 'result success';
         result.innerHTML = `
           ✅ <strong>Order Confirmed!</strong><br>
@@ -456,19 +623,29 @@
           Total: ₱${responseData.grandTotal}
         `;
         
-        // Clear cart
+        // CLEAR CART - Fixed
         cart = [];
         updateCart();
         document.getElementById('customer').value = '';
+        document.getElementById('payment').selectedIndex = 0;
+        
+        // Hide result after 5 seconds
+        setTimeout(() => {
+          result.style.display = 'none';
+        }, 5000);
         
       } catch (error) {
+        closeConfirmation();
         result.className = 'result error';
         result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
       } finally {
-        submitBtn.disabled = false;
-        loading.classList.remove('active');
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Order';
       }
     }
+    
+    // Initialize
+    loadOrderCounter();
   </script>
 </body>
 </html>
