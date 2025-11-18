@@ -405,247 +405,258 @@
   </div>
   
   <script>
-    const WEBHOOK_URL = 'https://n8n-production-211f.up.railway.app/webhook/bangus-order';
+  const WEBHOOK_URL = 'https://n8n-production-211f.up.railway.app/webhook/bangus-order';
+  
+  let cart = [];
+  
+  // Menu prices lookup
+  const menuPrices = {
+    'Shanghai Solo (6 pcs)': 120,
+    'Shanghai Busog (12 pcs)': 220,
+    'Bangus Sisig': 150,
+    'Power Bowl (Sisig + 3 shanghai)': 180,
+    'Ultimate Bowl (Sisig + 6 shanghai + egg)': 270,
+    'Extra Egg': 20,
+    'Extra Shanghai (3 pcs)': 40,
+    'Extra Rice': 25,
+    'Shanghai Bites (6 pcs, no rice)': 85,
+    'Shanghai Dozen (12 pcs, no rice)': 150
+  };
+  
+  // Get today's date key (YYYYMMDD)
+  function getTodayKey() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return year + month + day;
+  }
+  
+  // Load order counter from localStorage
+  function loadOrderCounter() {
+    const today = getTodayKey();
+    const saved = localStorage.getItem('bangusOrderDate');
+    const savedCounter = localStorage.getItem('bangusOrderCounter');
     
-    let cart = [];
-    let nextOrderNumber = 1; // Will be loaded from localStorage
+    // Reset counter if it's a new day
+    if (saved !== today) {
+      localStorage.setItem('bangusOrderDate', today);
+      localStorage.setItem('bangusOrderCounter', '1');
+      return 1;
+    }
     
-    // Menu prices lookup
-    const menuPrices = {
-      'Shanghai Solo (6 pcs)': 120,
-      'Shanghai Busog (12 pcs)': 220,
-      'Bangus Sisig': 150,
-      'Power Bowl (Sisig + 3 shanghai)': 180,
-      'Ultimate Bowl (Sisig + 6 shanghai + egg)': 270,
-      'Extra Egg': 20,
-      'Extra Shanghai (3 pcs)': 40,
-      'Extra Rice': 25,
-      'Shanghai Bites (6 pcs, no rice)': 85,
-      'Shanghai Dozen (12 pcs, no rice)': 150
+    return savedCounter ? parseInt(savedCounter) : 1;
+  }
+  
+  function getNextOrderNumber() {
+    const today = getTodayKey();
+    const counter = loadOrderCounter();
+    return 'BB' + today + '-' + String(counter).padStart(4, '0');
+  }
+  
+  function incrementOrderCounter() {
+    const counter = loadOrderCounter();
+    localStorage.setItem('bangusOrderCounter', counter + 1);
+  }
+  
+  function addToCart() {
+    const itemSelect = document.getElementById('item');
+    const qtyInput = document.getElementById('qty');
+    
+    const itemName = itemSelect.value;
+    const quantity = parseInt(qtyInput.value);
+    
+    if (!itemName) {
+      alert('Please select an item');
+      return;
+    }
+    
+    if (quantity < 1) {
+      alert('Quantity must be at least 1');
+      return;
+    }
+    
+    const price = menuPrices[itemName];
+    
+    // Check if item already in cart
+    const existingItem = cart.find(item => item.item === itemName);
+    
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.push({
+        item: itemName,
+        quantity: quantity,
+        price: price
+      });
+    }
+    
+    // Reset form
+    itemSelect.value = '';
+    qtyInput.value = 1;
+    
+    updateCart();
+  }
+  
+  function updateQuantity(itemName, change) {
+    const item = cart.find(i => i.item === itemName);
+    if (item) {
+      item.quantity += change;
+      if (item.quantity <= 0) {
+        removeFromCart(itemName);
+      } else {
+        updateCart();
+      }
+    }
+  }
+  
+  function removeFromCart(itemName) {
+    cart = cart.filter(item => item.item !== itemName);
+    updateCart();
+  }
+  
+  function updateCart() {
+    const cartContainer = document.getElementById('cartItems');
+    const cartCount = document.getElementById('cartCount');
+    const totalElement = document.getElementById('totalAmount');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (cart.length === 0) {
+      cartContainer.innerHTML = '<div class="cart-empty">Cart is empty. Add items above.</div>';
+      cartCount.textContent = '0';
+      totalElement.textContent = '0';
+      submitBtn.disabled = true;
+      return;
+    }
+    
+    // Calculate total
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Render cart
+    cartContainer.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.item}</div>
+          <div class="cart-item-details">
+            ₱${item.price} × ${item.quantity} = ₱${item.price * item.quantity}
+          </div>
+        </div>
+        <div class="cart-item-actions">
+          <button class="qty-btn" onclick="updateQuantity('${item.item}', -1)">−</button>
+          <span style="font-weight: 700; min-width: 25px; text-align: center;">${item.quantity}</span>
+          <button class="qty-btn" onclick="updateQuantity('${item.item}', 1)">+</button>
+          <button class="remove-btn" onclick="removeFromCart('${item.item}')">✕</button>
+        </div>
+      </div>
+    `).join('');
+    
+    cartCount.textContent = totalItems;
+    totalElement.textContent = total.toFixed(0);
+    submitBtn.disabled = false;
+  }
+  
+  function showConfirmation() {
+    if (cart.length === 0) {
+      alert('Cart is empty!');
+      return;
+    }
+    
+    const modal = document.getElementById('confirmModal');
+    const confirmItems = document.getElementById('confirmItems');
+    const confirmTotal = document.getElementById('confirmTotal');
+    const confirmPayment = document.getElementById('confirmPayment');
+    const confirmCustomer = document.getElementById('confirmCustomer');
+    const previewOrderNumber = document.getElementById('previewOrderNumber');
+    
+    // Calculate total
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Generate preview order number
+    previewOrderNumber.textContent = getNextOrderNumber();
+    
+    // Render items
+    confirmItems.innerHTML = cart.map(item => `
+      <div class="confirm-item">
+        <div>
+          <div style="font-weight: 600;">${item.item}</div>
+          <div style="font-size: 13px; color: #666;">₱${item.price} × ${item.quantity}</div>
+        </div>
+        <div style="font-weight: 700;">₱${item.price * item.quantity}</div>
+      </div>
+    `).join('');
+    
+    confirmTotal.textContent = total.toFixed(0);
+    confirmPayment.textContent = document.getElementById('payment').value;
+    confirmCustomer.textContent = document.getElementById('customer').value || 'Walk-in';
+    
+    modal.classList.add('active');
+  }
+  
+  function closeConfirmation() {
+    document.getElementById('confirmModal').classList.remove('active');
+  }
+  
+  async function submitOrder() {
+    const confirmBtn = document.getElementById('confirmBtn');
+    const result = document.getElementById('result');
+    
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Processing...';
+    
+    const data = {
+      items: cart.map(item => ({
+        item: item.item,
+        quantity: item.quantity
+      })),
+      payment: document.getElementById('payment').value,
+      customer: document.getElementById('customer').value || 'Walk-in'
     };
     
-    // Load order counter from localStorage
-    function loadOrderCounter() {
-      const saved = localStorage.getItem('bangusOrderCounter');
-      if (saved) {
-        nextOrderNumber = parseInt(saved);
-      } else {
-        nextOrderNumber = 1;
-      }
-    }
-    
-    function getNextOrderNumber() {
-      const orderNum = 'BB' + String(nextOrderNumber).padStart(4, '0');
-      return orderNum;
-    }
-    
-    function incrementOrderCounter() {
-      nextOrderNumber++;
-      localStorage.setItem('bangusOrderCounter', nextOrderNumber);
-    }
-    
-    function addToCart() {
-      const itemSelect = document.getElementById('item');
-      const qtyInput = document.getElementById('qty');
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
       
-      const itemName = itemSelect.value;
-      const quantity = parseInt(qtyInput.value);
+      if (!response.ok) throw new Error('Network error');
       
-      if (!itemName) {
-        alert('Please select an item');
-        return;
-      }
+      const responseData = await response.json();
       
-      if (quantity < 1) {
-        alert('Quantity must be at least 1');
-        return;
-      }
+      // Close modal
+      closeConfirmation();
       
-      const price = menuPrices[itemName];
+      // Increment order counter for next order
+      incrementOrderCounter();
       
-      // Check if item already in cart
-      const existingItem = cart.find(item => item.item === itemName);
+      result.className = 'result success';
+      result.innerHTML = `
+        ✅ <strong>Order Confirmed!</strong><br>
+        Order #${responseData.orderNumber}<br>
+        Total: ₱${responseData.grandTotal}
+      `;
       
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.push({
-          item: itemName,
-          quantity: quantity,
-          price: price
-        });
-      }
-      
-      // Reset form
-      itemSelect.value = '';
-      qtyInput.value = 1;
-      
+      // CLEAR CART
+      cart = [];
       updateCart();
+      document.getElementById('customer').value = '';
+      document.getElementById('payment').selectedIndex = 0;
+      
+      // Hide result after 5 seconds
+      setTimeout(() => {
+        result.style.display = 'none';
+      }, 5000);
+      
+    } catch (error) {
+      closeConfirmation();
+      result.className = 'result error';
+      result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Order';
     }
-    
-    function updateQuantity(itemName, change) {
-      const item = cart.find(i => i.item === itemName);
-      if (item) {
-        item.quantity += change;
-        if (item.quantity <= 0) {
-          removeFromCart(itemName);
-        } else {
-          updateCart();
-        }
-      }
-    }
-    
-    function removeFromCart(itemName) {
-      cart = cart.filter(item => item.item !== itemName);
-      updateCart();
-    }
-    
-    function updateCart() {
-      const cartContainer = document.getElementById('cartItems');
-      const cartCount = document.getElementById('cartCount');
-      const totalElement = document.getElementById('totalAmount');
-      const submitBtn = document.getElementById('submitBtn');
-      
-      if (cart.length === 0) {
-        cartContainer.innerHTML = '<div class="cart-empty">Cart is empty. Add items above.</div>';
-        cartCount.textContent = '0';
-        totalElement.textContent = '0';
-        submitBtn.disabled = true;
-        return;
-      }
-      
-      // Calculate total
-      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-      
-      // Render cart
-      cartContainer.innerHTML = cart.map(item => `
-        <div class="cart-item">
-          <div class="cart-item-info">
-            <div class="cart-item-name">${item.item}</div>
-            <div class="cart-item-details">
-              ₱${item.price} × ${item.quantity} = ₱${item.price * item.quantity}
-            </div>
-          </div>
-          <div class="cart-item-actions">
-            <button class="qty-btn" onclick="updateQuantity('${item.item}', -1)">−</button>
-            <span style="font-weight: 700; min-width: 25px; text-align: center;">${item.quantity}</span>
-            <button class="qty-btn" onclick="updateQuantity('${item.item}', 1)">+</button>
-            <button class="remove-btn" onclick="removeFromCart('${item.item}')">✕</button>
-          </div>
-        </div>
-      `).join('');
-      
-      cartCount.textContent = totalItems;
-      totalElement.textContent = total.toFixed(0);
-      submitBtn.disabled = false;
-    }
-    
-    function showConfirmation() {
-      if (cart.length === 0) {
-        alert('Cart is empty!');
-        return;
-      }
-      
-      const modal = document.getElementById('confirmModal');
-      const confirmItems = document.getElementById('confirmItems');
-      const confirmTotal = document.getElementById('confirmTotal');
-      const confirmPayment = document.getElementById('confirmPayment');
-      const confirmCustomer = document.getElementById('confirmCustomer');
-      const previewOrderNumber = document.getElementById('previewOrderNumber');
-      
-      // Calculate total
-      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
-      // Generate preview order number
-      previewOrderNumber.textContent = getNextOrderNumber();
-      
-      // Render items
-      confirmItems.innerHTML = cart.map(item => `
-        <div class="confirm-item">
-          <div>
-            <div style="font-weight: 600;">${item.item}</div>
-            <div style="font-size: 13px; color: #666;">₱${item.price} × ${item.quantity}</div>
-          </div>
-          <div style="font-weight: 700;">₱${item.price * item.quantity}</div>
-        </div>
-      `).join('');
-      
-      confirmTotal.textContent = total.toFixed(0);
-      confirmPayment.textContent = document.getElementById('payment').value;
-      confirmCustomer.textContent = document.getElementById('customer').value || 'Walk-in';
-      
-      modal.classList.add('active');
-    }
-    
-    function closeConfirmation() {
-      document.getElementById('confirmModal').classList.remove('active');
-    }
-    
-    async function submitOrder() {
-      const confirmBtn = document.getElementById('confirmBtn');
-      const loading = document.getElementById('loading');
-      const result = document.getElementById('result');
-      
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Processing...';
-      
-      const data = {
-        items: cart.map(item => ({
-          item: item.item,
-          quantity: item.quantity
-        })),
-        payment: document.getElementById('payment').value,
-        customer: document.getElementById('customer').value || 'Walk-in'
-      };
-      
-      try {
-        const response = await fetch(WEBHOOK_URL, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(data)
-        });
-        
-        if (!response.ok) throw new Error('Network error');
-        
-        const responseData = await response.json();
-        
-        // Close modal
-        closeConfirmation();
-        
-        // Increment order counter for next order
-        incrementOrderCounter();
-        
-        result.className = 'result success';
-        result.innerHTML = `
-          ✅ <strong>Order Confirmed!</strong><br>
-          Order #${responseData.orderNumber}<br>
-          Total: ₱${responseData.grandTotal}
-        `;
-        
-        // CLEAR CART - Fixed
-        cart = [];
-        updateCart();
-        document.getElementById('customer').value = '';
-        document.getElementById('payment').selectedIndex = 0;
-        
-        // Hide result after 5 seconds
-        setTimeout(() => {
-          result.style.display = 'none';
-        }, 5000);
-        
-      } catch (error) {
-        closeConfirmation();
-        result.className = 'result error';
-        result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
-      } finally {
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Confirm Order';
-      }
-    }
-    
-    // Initialize
-    loadOrderCounter();
-  </script>
+  }
+</script>
 </body>
 </html>
