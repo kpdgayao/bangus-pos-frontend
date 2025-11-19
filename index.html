@@ -423,42 +423,6 @@
     'Shanghai Dozen (12 pcs, no rice)': 150
   };
   
-  // Get today's date key (YYYYMMDD)
-  function getTodayKey() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return year + month + day;
-  }
-  
-  // Load order counter from localStorage
-  function loadOrderCounter() {
-    const today = getTodayKey();
-    const saved = localStorage.getItem('bangusOrderDate');
-    const savedCounter = localStorage.getItem('bangusOrderCounter');
-    
-    // Reset counter if it's a new day
-    if (saved !== today) {
-      localStorage.setItem('bangusOrderDate', today);
-      localStorage.setItem('bangusOrderCounter', '1');
-      return 1;
-    }
-    
-    return savedCounter ? parseInt(savedCounter) : 1;
-  }
-  
-  function getNextOrderNumber() {
-    const today = getTodayKey();
-    const counter = loadOrderCounter();
-    return 'BB' + today + '-' + String(counter).padStart(4, '0');
-  }
-  
-  function incrementOrderCounter() {
-    const counter = loadOrderCounter();
-    localStorage.setItem('bangusOrderCounter', counter + 1);
-  }
-  
   function addToCart() {
     const itemSelect = document.getElementById('item');
     const qtyInput = document.getElementById('qty');
@@ -572,8 +536,8 @@
     // Calculate total
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    // Generate preview order number
-    previewOrderNumber.textContent = getNextOrderNumber();
+    // Backend will generate the order number
+    previewOrderNumber.textContent = 'Pending...';
     
     // Render items
     confirmItems.innerHTML = cart.map(item => `
@@ -598,69 +562,62 @@
   }
   
   async function submitOrder() {
-  const confirmBtn = document.getElementById('confirmBtn');
-  const result = document.getElementById('result');
-  
-  confirmBtn.disabled = true;
-  confirmBtn.textContent = 'Processing...';
-  
-  // Generate order number on frontend
-  const orderNumber = getNextOrderNumber();
-  
-  const data = {
-    orderNumber: orderNumber,  // ← ADD THIS
-    items: cart.map(item => ({
-      item: item.item,
-      quantity: item.quantity
-    })),
-    payment: document.getElementById('payment').value,
-    customer: document.getElementById('customer').value || 'Walk-in'
-  };
-  
-  try {
-    const response = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    });
+    const confirmBtn = document.getElementById('confirmBtn');
+    const result = document.getElementById('result');
     
-    if (!response.ok) throw new Error('Network error');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Processing...';
     
-    const responseData = await response.json();
+    const data = {
+      items: cart.map(item => ({
+        item: item.item,
+        quantity: item.quantity
+      })),
+      payment: document.getElementById('payment').value,
+      customer: document.getElementById('customer').value || 'Walk-in'
+    };
     
-    // Close modal
-    closeConfirmation();
-    
-    // Increment order counter for next order
-    incrementOrderCounter();
-    
-    result.className = 'result success';
-    result.innerHTML = `
-      ✅ <strong>Order Confirmed!</strong><br>
-      Order #${responseData.orderNumber}<br>
-      Total: ₱${responseData.grandTotal}
-    `;
-    
-    // CLEAR CART
-    cart = [];
-    updateCart();
-    document.getElementById('customer').value = '';
-    document.getElementById('payment').selectedIndex = 0;
-    
-    // Hide result after 5 seconds
-    setTimeout(() => {
-      result.style.display = 'none';
-    }, 5000);
-    
-  } catch (error) {
-    closeConfirmation();
-    result.className = 'result error';
-    result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
-  } finally {
-    confirmBtn.disabled = false;
-    confirmBtn.textContent = 'Confirm Order';
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) throw new Error('Network error');
+      
+      const responseData = await response.json();
+      
+      // Close modal
+      closeConfirmation();
+      
+      result.className = 'result success';
+      result.innerHTML = `
+        ✅ <strong>Order Confirmed!</strong><br>
+        Order #${responseData.orderNumber}<br>
+        Total: ₱${responseData.grandTotal}
+      `;
+      
+      // Clear cart
+      cart = [];
+      updateCart();
+      document.getElementById('customer').value = '';
+      document.getElementById('payment').selectedIndex = 0;
+      
+      // Hide result after 5 seconds
+      setTimeout(() => {
+        result.style.display = 'none';
+      }, 5000);
+      
+    } catch (error) {
+      closeConfirmation();
+      result.className = 'result error';
+      result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Order';
+    }
   }
-}
-</script>
+  </script>
 </body>
 </html>
