@@ -309,12 +309,87 @@
     .loading.active { display: block; }
     .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Recent Orders Section */
+    .recent-orders-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+    .recent-orders-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .recent-orders-empty {
+      text-align: center;
+      color: #999;
+      padding: 20px 0;
+      font-size: 14px;
+    }
+    .recent-order-item {
+      background: white;
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border-left: 4px solid #667eea;
+    }
+    .recent-order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .recent-order-number {
+      font-weight: 700;
+      color: #667eea;
+      font-size: 14px;
+    }
+    .recent-order-total {
+      font-weight: 700;
+      color: #28a745;
+      font-size: 14px;
+    }
+    .recent-order-details {
+      font-size: 12px;
+      color: #666;
+    }
+    .clear-history-btn {
+      background: transparent;
+      border: 1px solid #dc3545;
+      color: #dc3545;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .clear-history-btn:hover {
+      background: #dc3545;
+      color: white;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🐟 Order Form</h1>
     <p class="subtitle">Brent Bazaar 2025</p>
+
+    <!-- Recent Orders Section -->
+    <div class="recent-orders-section">
+      <div class="recent-orders-title">
+        📋 Recent Orders
+        <button class="clear-history-btn" onclick="clearOrderHistory()" id="clearHistoryBtn" style="display: none;">Clear</button>
+      </div>
+      <div id="recentOrdersList">
+        <div class="recent-orders-empty">No orders yet</div>
+      </div>
+    </div>
     
     <!-- Add to Cart Section -->
     <div class="add-section">
@@ -422,6 +497,79 @@
     'Shanghai Bites (6 pcs, no rice)': 85,
     'Shanghai Dozen (12 pcs, no rice)': 150
   };
+  
+  // Load recent orders from localStorage
+  function loadRecentOrders() {
+    const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
+    displayRecentOrders(orders);
+  }
+  
+  // Display recent orders
+  function displayRecentOrders(orders) {
+    const container = document.getElementById('recentOrdersList');
+    const clearBtn = document.getElementById('clearHistoryBtn');
+    
+    if (orders.length === 0) {
+      container.innerHTML = '<div class="recent-orders-empty">No orders yet</div>';
+      clearBtn.style.display = 'none';
+      return;
+    }
+    
+    clearBtn.style.display = 'block';
+    
+    // Show last 10 orders (most recent first)
+    const recentOrders = orders.slice(-10).reverse();
+    
+    container.innerHTML = recentOrders.map(order => `
+      <div class="recent-order-item">
+        <div class="recent-order-header">
+          <span class="recent-order-number">${order.orderNumber}</span>
+          <span class="recent-order-total">₱${order.total}</span>
+        </div>
+        <div class="recent-order-details">
+          ${order.customer} • ${order.payment} • ${order.timestamp}
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Save order to history
+  function saveOrderToHistory(orderData) {
+    const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
+    
+    orders.push({
+      orderNumber: orderData.orderNumber,
+      total: orderData.grandTotal,
+      customer: orderData.customer,
+      payment: orderData.payment,
+      timestamp: new Date().toLocaleString('en-PH', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      })
+    });
+    
+    // Keep only last 50 orders to avoid localStorage bloat
+    if (orders.length > 50) {
+      orders.shift();
+    }
+    
+    localStorage.setItem('recentOrders', JSON.stringify(orders));
+    loadRecentOrders();
+  }
+  
+  // Clear order history
+  function clearOrderHistory() {
+    if (confirm('Clear all order history?')) {
+      localStorage.removeItem('recentOrders');
+      loadRecentOrders();
+    }
+  }
+  
+  // Load orders when page loads
+  window.addEventListener('DOMContentLoaded', loadRecentOrders);
   
   function addToCart() {
     const itemSelect = document.getElementById('item');
@@ -590,6 +738,9 @@
       
       // Close modal
       closeConfirmation();
+      
+      // Save to recent orders history
+      saveOrderToHistory(responseData);
       
       result.className = 'result success';
       result.innerHTML = `
