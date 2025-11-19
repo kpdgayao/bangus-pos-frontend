@@ -3,63 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bangus Bowls</title>
+  <title>🐟 Order Form</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       padding: 20px;
+      color: #333;
     }
+    
     .container {
+      max-width: 450px;
+      margin: 0 auto;
       background: white;
       border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      max-width: 450px;
-      width: 100%;
       padding: 30px;
-      max-height: 90vh;
-      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
-    h1 { 
+    
+    .header {
       text-align: center;
-      color: #333;
-      margin-bottom: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
       font-size: 28px;
+      color: #667eea;
+      margin-bottom: 5px;
     }
-    .subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 25px;
+    
+    .header p {
+      color: #999;
       font-size: 14px;
     }
     
-    /* Add to Cart Section */
-    .add-section {
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 20px;
-    }
     label {
       display: block;
-      margin: 12px 0 5px;
-      color: #555;
+      margin-bottom: 8px;
       font-weight: 600;
+      color: #555;
       font-size: 14px;
     }
-    select, input {
+    
+    select, input[type="number"], input[type="text"] {
       width: 100%;
       padding: 12px;
       border: 2px solid #e0e0e0;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 15px;
+      margin-bottom: 15px;
       transition: all 0.3s;
+      background: white;
     }
+    
     select:focus, input:focus {
       outline: none;
       border-color: #667eea;
@@ -68,126 +71,158 @@
     
     .add-btn {
       width: 100%;
-      padding: 12px;
-      background: #667eea;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
       font-weight: 700;
-      margin-top: 15px;
-      font-size: 14px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      transition: transform 0.2s;
     }
-    .add-btn:hover { background: #5568d3; }
-    .add-btn:disabled { background: #ccc; cursor: not-allowed; }
     
-    /* Cart Section */
-    .cart-section {
-      margin: 20px 0;
+    .add-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102,126,234,0.3);
     }
+    
+    .cart-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    
     .cart-title {
       font-size: 18px;
       font-weight: 700;
       color: #333;
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
+    
     .cart-count {
       background: #667eea;
       color: white;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
     }
+    
     .cart-empty {
       text-align: center;
       color: #999;
-      padding: 30px 0;
+      padding: 30px 20px;
       font-size: 14px;
     }
+    
     .cart-item {
-      background: #f8f9fa;
-      padding: 15px;
+      background: white;
+      padding: 12px;
       border-radius: 10px;
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
+    
     .cart-item-info {
       flex: 1;
     }
+    
     .cart-item-name {
       font-weight: 600;
       color: #333;
+      margin-bottom: 4px;
       font-size: 14px;
-      margin-bottom: 5px;
     }
+    
     .cart-item-details {
-      font-size: 13px;
+      font-size: 12px;
       color: #666;
     }
+    
     .cart-item-actions {
       display: flex;
       gap: 8px;
       align-items: center;
     }
+    
     .qty-btn {
       background: #667eea;
       color: white;
       border: none;
       width: 28px;
       height: 28px;
-      border-radius: 50%;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.2s;
     }
-    .qty-btn:hover { background: #5568d3; }
+    
+    .qty-btn:hover {
+      background: #5568d3;
+    }
+    
     .remove-btn {
       background: #dc3545;
       color: white;
       border: none;
-      padding: 6px 12px;
+      width: 28px;
+      height: 28px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
     }
-    .remove-btn:hover { background: #c82333; }
     
-    /* Total Section */
+    .remove-btn:hover {
+      background: #c82333;
+    }
+    
     .total-section {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
       padding: 20px;
       border-radius: 15px;
-      margin: 20px 0;
+      color: white;
       text-align: center;
+      margin-top: 15px;
     }
+    
     .total-label {
       font-size: 14px;
       opacity: 0.9;
       margin-bottom: 5px;
     }
+    
     .total-amount {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 700;
     }
     
-    /* Checkout Section */
     .checkout-section {
       margin-top: 20px;
     }
+    
     .submit-btn {
       width: 100%;
       padding: 16px;
@@ -198,81 +233,141 @@
       cursor: pointer;
       font-weight: 700;
       font-size: 16px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 15px;
+      transition: all 0.2s;
     }
-    .submit-btn:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(40,167,69,0.4); }
-    .submit-btn:active { transform: translateY(0); }
-    .submit-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
     
-    /* Confirmation Modal */
+    .submit-btn:hover:not(:disabled) {
+      background: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(40,167,69,0.3);
+    }
+    
+    .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 30px;
+    }
+    
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .result {
+      display: none;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    
+    .result.success {
+      display: block;
+      background: #d4edda;
+      color: #155724;
+      border: 2px solid #c3e6cb;
+    }
+    
+    .result.error {
+      display: block;
+      background: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+    
     .modal {
       display: none;
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      right: 0;
+      bottom: 0;
       background: rgba(0,0,0,0.6);
       z-index: 1000;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
-    .modal.active { display: flex; }
+    
+    .modal.active {
+      display: flex;
+    }
+    
     .modal-content {
       background: white;
-      border-radius: 20px;
       padding: 30px;
+      border-radius: 20px;
       max-width: 400px;
       width: 100%;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
+    
     .modal-header {
       text-align: center;
       margin-bottom: 20px;
     }
-    .modal-header h2 {
-      color: #333;
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-    .order-number {
-      background: #667eea;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 20px;
+    
+    .modal-title {
+      font-size: 22px;
       font-weight: 700;
-      display: inline-block;
+      color: #333;
+      margin-bottom: 5px;
     }
+    
+    .order-number {
+      font-size: 16px;
+      color: #667eea;
+      font-weight: 600;
+    }
+    
     .modal-body {
-      margin: 20px 0;
+      margin-bottom: 25px;
     }
+    
     .confirm-item {
-      padding: 10px 0;
-      border-bottom: 1px solid #e0e0e0;
       display: flex;
       justify-content: space-between;
-    }
-    .confirm-total {
-      margin-top: 15px;
-      padding: 15px;
+      padding: 12px;
       background: #f8f9fa;
-      border-radius: 10px;
-      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 8px;
     }
+    
+    .confirm-total {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 15px;
+      border-radius: 10px;
+      color: white;
+      text-align: center;
+      margin-top: 15px;
+    }
+    
     .confirm-total-amount {
       font-size: 28px;
       font-weight: 700;
-      color: #667eea;
     }
-    .modal-buttons {
+    
+    .modal-actions {
       display: flex;
       gap: 10px;
-      margin-top: 20px;
     }
+    
     .modal-btn {
       flex: 1;
       padding: 14px;
@@ -280,164 +375,251 @@
       border-radius: 10px;
       cursor: pointer;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 15px;
+      transition: all 0.2s;
     }
-    .btn-cancel {
+    
+    .cancel-btn {
       background: #6c757d;
       color: white;
     }
-    .btn-cancel:hover { background: #5a6268; }
-    .btn-confirm {
+    
+    .cancel-btn:hover {
+      background: #5a6268;
+    }
+    
+    .confirm-btn {
       background: #28a745;
       color: white;
     }
-    .btn-confirm:hover { background: #218838; }
-    .btn-confirm:disabled { background: #ccc; cursor: not-allowed; }
     
-    .result {
-      margin-top: 20px;
-      padding: 15px;
+    .confirm-btn:hover:not(:disabled) {
+      background: #218838;
+    }
+    
+    .confirm-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Payment-specific fields */
+    .payment-specific-field {
+      display: none;
+      margin-top: 12px;
+    }
+    .payment-specific-field.active {
+      display: block;
+    }
+    .change-display {
+      background: #d4edda;
+      padding: 12px;
       border-radius: 10px;
+      margin-top: 12px;
       text-align: center;
-      font-weight: 600;
       display: none;
     }
-    .result.success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; display: block; }
-    .result.error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; display: block; }
-    
-    .loading { display: none; text-align: center; margin-top: 15px; }
-    .loading.active { display: block; }
-    .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* Recent Orders Section */
-    .recent-orders-section {
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 20px;
+    .change-display.active {
+      display: block;
     }
-    .recent-orders-title {
-      font-size: 18px;
+    .change-amount {
+      font-size: 24px;
       font-weight: 700;
-      color: #333;
-      margin-bottom: 15px;
+      color: #28a745;
+    }
+
+    /* Recent Orders Drawer */
+    .recent-orders-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 999;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .recent-orders-drawer.open {
+      transform: translateY(0);
+    }
+    .drawer-toggle-btn {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 15px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .drawer-toggle-btn:hover {
+      background: #5568d3;
+    }
+    .drawer-content {
+      padding: 20px;
+      max-width: 450px;
+      margin: 0 auto;
+    }
+    .drawer-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
     }
+    .drawer-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+    }
+    .drawer-close {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .drawer-close:hover {
+      background: #c82333;
+    }
+    
     .recent-orders-empty {
       text-align: center;
       color: #999;
-      padding: 20px 0;
+      padding: 30px 20px;
       font-size: 14px;
     }
+    
     .recent-order-item {
-      background: white;
-      padding: 12px 15px;
+      background: #f8f9fa;
+      padding: 12px;
       border-radius: 10px;
       margin-bottom: 10px;
-      border-left: 4px solid #667eea;
     }
+    
     .recent-order-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 5px;
     }
+    
     .recent-order-number {
       font-weight: 700;
       color: #667eea;
       font-size: 14px;
     }
+    
     .recent-order-total {
       font-weight: 700;
       color: #28a745;
-      font-size: 14px;
+      font-size: 15px;
     }
+    
     .recent-order-details {
       font-size: 12px;
       color: #666;
     }
+    
     .clear-history-btn {
-      background: transparent;
-      border: 1px solid #dc3545;
-      color: #dc3545;
-      padding: 5px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .clear-history-btn:hover {
+      width: 100%;
+      padding: 10px;
       background: #dc3545;
       color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    
+    .clear-history-btn:hover {
+      background: #c82333;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🐟 Order Form</h1>
-    <p class="subtitle">Brent Bazaar 2025</p>
-
-    <!-- Recent Orders Section -->
-    <div class="recent-orders-section">
-      <div class="recent-orders-title">
-        📋 Recent Orders
-        <button class="clear-history-btn" onclick="clearOrderHistory()" id="clearHistoryBtn" style="display: none;">Clear</button>
-      </div>
-      <div id="recentOrdersList">
-        <div class="recent-orders-empty">No orders yet</div>
-      </div>
+    <div class="header">
+      <h1>🐟 Order Form</h1>
+      <p>Brent Bazaar 2025</p>
     </div>
-    
-    <!-- Add to Cart Section -->
-    <div class="add-section">
+
+    <!-- Add Items Section -->
+    <div>
       <label for="item">Select Item</label>
-      <select id="item" required>
+      <select id="item">
         <option value="">-- Choose your item --</option>
-        <option value="Shanghai Solo (6 pcs)" data-price="120">Shanghai Solo (6 pcs) - ₱120</option>
-        <option value="Shanghai Busog (12 pcs)" data-price="220">Shanghai Busog (12 pcs) - ₱220</option>
-        <option value="Bangus Sisig" data-price="150">Bangus Sisig - ₱150</option>
-        <option value="Power Bowl (Sisig + 3 shanghai)" data-price="180">Power Bowl (Sisig + 3 shanghai) - ₱180</option>
-        <option value="Ultimate Bowl (Sisig + 6 shanghai + egg)" data-price="270">Ultimate Bowl (Sisig + 6 shanghai + egg) - ₱270</option>
-        <option value="Extra Egg" data-price="20">Extra Egg - ₱20</option>
-        <option value="Extra Shanghai (3 pcs)" data-price="40">Extra Shanghai (3 pcs) - ₱40</option>
-        <option value="Extra Rice" data-price="25">Extra Rice - ₱25</option>
-        <option value="Shanghai Bites (6 pcs, no rice)" data-price="85">Shanghai Bites (6 pcs, no rice) - ₱85</option>
-        <option value="Shanghai Dozen (12 pcs, no rice)" data-price="150">Shanghai Dozen (12 pcs, no rice) - ₱150</option>
+        <option value="Shanghai Solo (6 pcs)">Shanghai Solo (6 pcs) - ₱120</option>
+        <option value="Shanghai Busog (12 pcs)">Shanghai Busog (12 pcs) - ₱220</option>
+        <option value="Bangus Sisig">Bangus Sisig - ₱150</option>
+        <option value="Power Bowl (Sisig + 3 shanghai)">Power Bowl (Sisig + 3 shanghai) - ₱180</option>
+        <option value="Ultimate Bowl (Sisig + 6 shanghai + egg)">Ultimate Bowl (Sisig + 6 shanghai + egg) - ₱270</option>
+        <option value="Extra Egg">Extra Egg - ₱20</option>
+        <option value="Extra Shanghai (3 pcs)">Extra Shanghai (3 pcs) - ₱40</option>
+        <option value="Extra Rice">Extra Rice - ₱25</option>
+        <option value="Shanghai Bites (6 pcs, no rice)">Shanghai Bites (6 pcs, no rice) - ₱85</option>
+        <option value="Shanghai Dozen (12 pcs, no rice)">Shanghai Dozen (12 pcs, no rice) - ₱150</option>
       </select>
-      
+
       <label for="qty">Quantity</label>
-      <input type="number" id="qty" value="1" min="1" max="20">
-      
+      <input type="number" id="qty" min="1" value="1">
+
       <button class="add-btn" onclick="addToCart()">➕ Add to Cart</button>
     </div>
-    
+
     <!-- Cart Section -->
     <div class="cart-section">
-      <div class="cart-title">
-        🛒 Your Cart
-        <span class="cart-count" id="cartCount">0</span>
+      <div class="cart-header">
+        <div class="cart-title">🛒 Your Cart</div>
+        <div class="cart-count" id="cartCount">0</div>
       </div>
       <div id="cartItems">
         <div class="cart-empty">Cart is empty. Add items above.</div>
       </div>
+      <div class="total-section">
+        <div class="total-label">Total Amount</div>
+        <div class="total-amount">₱<span id="totalAmount">0</span></div>
+      </div>
     </div>
-    
-    <!-- Total -->
-    <div class="total-section">
-      <div class="total-label">Total Amount</div>
-      <div class="total-amount">₱<span id="totalAmount">0</span></div>
-    </div>
-    
+
     <!-- Checkout Section -->
     <div class="checkout-section">
       <label for="payment">Payment Method</label>
-      <select id="payment" required>
+      <select id="payment" required onchange="togglePaymentFields()">
         <option value="Cash">💵 Cash</option>
         <option value="GCash">📱 GCash</option>
       </select>
+      
+      <!-- Cash-specific fields -->
+      <div id="cashFields" class="payment-specific-field active">
+        <label for="amountTendered">Amount Tendered</label>
+        <input type="number" id="amountTendered" placeholder="0" min="0" step="0.01" oninput="calculateChange()">
+        
+        <div id="changeDisplay" class="change-display">
+          <div style="color: #155724; font-size: 14px; margin-bottom: 5px;">Change</div>
+          <div class="change-amount">₱<span id="changeAmount">0</span></div>
+        </div>
+      </div>
+      
+      <!-- GCash-specific fields -->
+      <div id="gcashFields" class="payment-specific-field">
+        <label for="referenceNumber">Reference Number</label>
+        <input type="text" id="referenceNumber" placeholder="Enter GCash reference number">
+      </div>
       
       <label for="customer">Customer Name (optional)</label>
       <input type="text" id="customer" placeholder="Your name">
@@ -445,330 +627,420 @@
       <button class="submit-btn" id="submitBtn" onclick="showConfirmation()" disabled>
         🚀 Place Order
       </button>
+      
+      <button class="drawer-toggle-btn" onclick="toggleDrawer()">
+        📋 View Recent Orders
+      </button>
     </div>
-    
+
     <div class="loading" id="loading">
       <div class="spinner"></div>
     </div>
-    
+
     <div id="result" class="result"></div>
   </div>
-  
+
+  <!-- Recent Orders Drawer -->
+  <div class="recent-orders-drawer" id="recentOrdersDrawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <div class="drawer-title">📋 Recent Orders</div>
+        <button class="drawer-close" onclick="toggleDrawer()">Close</button>
+      </div>
+      <button class="clear-history-btn" onclick="clearOrderHistory()" id="clearHistoryBtn" style="display: none; margin-bottom: 15px;">Clear History</button>
+      <div id="recentOrdersList">
+        <div class="recent-orders-empty">No orders yet</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Confirmation Modal -->
   <div class="modal" id="confirmModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Confirm Order</h2>
+        <div class="modal-title">Confirm Order</div>
         <div class="order-number" id="previewOrderNumber">BB0001</div>
       </div>
       <div class="modal-body">
         <div id="confirmItems"></div>
         <div class="confirm-total">
-          <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Total Amount</div>
+          <div style="color: rgba(255,255,255,0.9); font-size: 14px; margin-bottom: 5px;">Total Amount</div>
           <div class="confirm-total-amount">₱<span id="confirmTotal">0</span></div>
         </div>
         <div style="margin-top: 15px; text-align: center;">
           <div style="color: #666; font-size: 13px;">Payment: <strong id="confirmPayment"></strong></div>
+          <div style="color: #666; font-size: 13px;" id="confirmPaymentDetails"></div>
           <div style="color: #666; font-size: 13px;">Customer: <strong id="confirmCustomer"></strong></div>
         </div>
       </div>
-      <div class="modal-buttons">
-        <button class="modal-btn btn-cancel" onclick="closeConfirmation()">Cancel</button>
-        <button class="modal-btn btn-confirm" id="confirmBtn" onclick="submitOrder()">Confirm Order</button>
+      <div class="modal-actions">
+        <button class="modal-btn cancel-btn" onclick="closeConfirmation()">Cancel</button>
+        <button class="modal-btn confirm-btn" id="confirmBtn" onclick="submitOrder()">Confirm Order</button>
       </div>
     </div>
   </div>
-  
+
   <script>
-  const WEBHOOK_URL = 'https://n8n-production-211f.up.railway.app/webhook/bangus-order';
-  
-  let cart = [];
-  
-  // Menu prices lookup
-  const menuPrices = {
-    'Shanghai Solo (6 pcs)': 120,
-    'Shanghai Busog (12 pcs)': 220,
-    'Bangus Sisig': 150,
-    'Power Bowl (Sisig + 3 shanghai)': 180,
-    'Ultimate Bowl (Sisig + 6 shanghai + egg)': 270,
-    'Extra Egg': 20,
-    'Extra Shanghai (3 pcs)': 40,
-    'Extra Rice': 25,
-    'Shanghai Bites (6 pcs, no rice)': 85,
-    'Shanghai Dozen (12 pcs, no rice)': 150
-  };
-  
-  // Load recent orders from localStorage
-  function loadRecentOrders() {
-    const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
-    displayRecentOrders(orders);
-  }
-  
-  // Display recent orders
-  function displayRecentOrders(orders) {
-    const container = document.getElementById('recentOrdersList');
-    const clearBtn = document.getElementById('clearHistoryBtn');
-    
-    if (orders.length === 0) {
-      container.innerHTML = '<div class="recent-orders-empty">No orders yet</div>';
-      clearBtn.style.display = 'none';
-      return;
+    const WEBHOOK_URL = 'https://n8n-production-211f.up.railway.app/webhook/bangus-order';
+
+    let cart = [];
+
+    const menuPrices = {
+      'Shanghai Solo (6 pcs)': 120,
+      'Shanghai Busog (12 pcs)': 220,
+      'Bangus Sisig': 150,
+      'Power Bowl (Sisig + 3 shanghai)': 180,
+      'Ultimate Bowl (Sisig + 6 shanghai + egg)': 270,
+      'Extra Egg': 20,
+      'Extra Shanghai (3 pcs)': 40,
+      'Extra Rice': 25,
+      'Shanghai Bites (6 pcs, no rice)': 85,
+      'Shanghai Dozen (12 pcs, no rice)': 150
+    };
+
+    // Toggle drawer
+    function toggleDrawer() {
+      const drawer = document.getElementById('recentOrdersDrawer');
+      drawer.classList.toggle('open');
     }
-    
-    clearBtn.style.display = 'block';
-    
-    // Show last 10 orders (most recent first)
-    const recentOrders = orders.slice(-10).reverse();
-    
-    container.innerHTML = recentOrders.map(order => `
-      <div class="recent-order-item">
-        <div class="recent-order-header">
-          <span class="recent-order-number">${order.orderNumber}</span>
-          <span class="recent-order-total">₱${order.total}</span>
-        </div>
-        <div class="recent-order-details">
-          ${order.customer} • ${order.payment} • ${order.timestamp}
-        </div>
-      </div>
-    `).join('');
-  }
-  
-  // Save order to history
-  function saveOrderToHistory(orderData) {
-    const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
-    
-    orders.push({
-      orderNumber: orderData.orderNumber,
-      total: orderData.grandTotal,
-      customer: orderData.customer,
-      payment: orderData.payment,
-      timestamp: new Date().toLocaleString('en-PH', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      })
-    });
-    
-    // Keep only last 50 orders to avoid localStorage bloat
-    if (orders.length > 50) {
-      orders.shift();
-    }
-    
-    localStorage.setItem('recentOrders', JSON.stringify(orders));
-    loadRecentOrders();
-  }
-  
-  // Clear order history
-  function clearOrderHistory() {
-    if (confirm('Clear all order history?')) {
-      localStorage.removeItem('recentOrders');
-      loadRecentOrders();
-    }
-  }
-  
-  // Load orders when page loads
-  window.addEventListener('DOMContentLoaded', loadRecentOrders);
-  
-  function addToCart() {
-    const itemSelect = document.getElementById('item');
-    const qtyInput = document.getElementById('qty');
-    
-    const itemName = itemSelect.value;
-    const quantity = parseInt(qtyInput.value);
-    
-    if (!itemName) {
-      alert('Please select an item');
-      return;
-    }
-    
-    if (quantity < 1) {
-      alert('Quantity must be at least 1');
-      return;
-    }
-    
-    const price = menuPrices[itemName];
-    
-    // Check if item already in cart
-    const existingItem = cart.find(item => item.item === itemName);
-    
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      cart.push({
-        item: itemName,
-        quantity: quantity,
-        price: price
-      });
-    }
-    
-    // Reset form
-    itemSelect.value = '';
-    qtyInput.value = 1;
-    
-    updateCart();
-  }
-  
-  function updateQuantity(itemName, change) {
-    const item = cart.find(i => i.item === itemName);
-    if (item) {
-      item.quantity += change;
-      if (item.quantity <= 0) {
-        removeFromCart(itemName);
+
+    // Toggle payment-specific fields
+    function togglePaymentFields() {
+      const payment = document.getElementById('payment').value;
+      const cashFields = document.getElementById('cashFields');
+      const gcashFields = document.getElementById('gcashFields');
+      
+      if (payment === 'Cash') {
+        cashFields.classList.add('active');
+        gcashFields.classList.remove('active');
+        document.getElementById('referenceNumber').value = '';
       } else {
-        updateCart();
+        cashFields.classList.remove('active');
+        gcashFields.classList.add('active');
+        document.getElementById('amountTendered').value = '';
+        document.getElementById('changeDisplay').classList.remove('active');
       }
     }
-  }
-  
-  function removeFromCart(itemName) {
-    cart = cart.filter(item => item.item !== itemName);
-    updateCart();
-  }
-  
-  function updateCart() {
-    const cartContainer = document.getElementById('cartItems');
-    const cartCount = document.getElementById('cartCount');
-    const totalElement = document.getElementById('totalAmount');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    if (cart.length === 0) {
-      cartContainer.innerHTML = '<div class="cart-empty">Cart is empty. Add items above.</div>';
-      cartCount.textContent = '0';
-      totalElement.textContent = '0';
-      submitBtn.disabled = true;
-      return;
+
+    // Calculate change for cash payments
+    function calculateChange() {
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const tendered = parseFloat(document.getElementById('amountTendered').value) || 0;
+      const change = tendered - total;
+      
+      const changeDisplay = document.getElementById('changeDisplay');
+      const changeAmount = document.getElementById('changeAmount');
+      
+      if (tendered >= total && tendered > 0) {
+        changeDisplay.classList.add('active');
+        changeAmount.textContent = change.toFixed(2);
+      } else {
+        changeDisplay.classList.remove('active');
+      }
     }
-    
-    // Calculate total
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    
-    // Render cart
-    cartContainer.innerHTML = cart.map(item => `
-      <div class="cart-item">
-        <div class="cart-item-info">
-          <div class="cart-item-name">${item.item}</div>
-          <div class="cart-item-details">
-            ₱${item.price} × ${item.quantity} = ₱${item.price * item.quantity}
+
+    // Load recent orders from localStorage
+    function loadRecentOrders() {
+      const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
+      displayRecentOrders(orders);
+    }
+
+    // Display recent orders
+    function displayRecentOrders(orders) {
+      const container = document.getElementById('recentOrdersList');
+      const clearBtn = document.getElementById('clearHistoryBtn');
+      
+      if (orders.length === 0) {
+        container.innerHTML = '<div class="recent-orders-empty">No orders yet</div>';
+        clearBtn.style.display = 'none';
+        return;
+      }
+      
+      clearBtn.style.display = 'block';
+      
+      const recentOrders = orders.slice(-20).reverse();
+      
+      container.innerHTML = recentOrders.map(order => `
+        <div class="recent-order-item">
+          <div class="recent-order-header">
+            <span class="recent-order-number">${order.orderNumber}</span>
+            <span class="recent-order-total">₱${order.total}</span>
+          </div>
+          <div class="recent-order-details">
+            ${order.customer} • ${order.payment} • ${order.timestamp}
           </div>
         </div>
-        <div class="cart-item-actions">
-          <button class="qty-btn" onclick="updateQuantity('${item.item}', -1)">−</button>
-          <span style="font-weight: 700; min-width: 25px; text-align: center;">${item.quantity}</span>
-          <button class="qty-btn" onclick="updateQuantity('${item.item}', 1)">+</button>
-          <button class="remove-btn" onclick="removeFromCart('${item.item}')">✕</button>
-        </div>
-      </div>
-    `).join('');
-    
-    cartCount.textContent = totalItems;
-    totalElement.textContent = total.toFixed(0);
-    submitBtn.disabled = false;
-  }
-  
-  function showConfirmation() {
-    if (cart.length === 0) {
-      alert('Cart is empty!');
-      return;
+      `).join('');
     }
-    
-    const modal = document.getElementById('confirmModal');
-    const confirmItems = document.getElementById('confirmItems');
-    const confirmTotal = document.getElementById('confirmTotal');
-    const confirmPayment = document.getElementById('confirmPayment');
-    const confirmCustomer = document.getElementById('confirmCustomer');
-    const previewOrderNumber = document.getElementById('previewOrderNumber');
-    
-    // Calculate total
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // Backend will generate the order number
-    previewOrderNumber.textContent = 'Pending...';
-    
-    // Render items
-    confirmItems.innerHTML = cart.map(item => `
-      <div class="confirm-item">
-        <div>
-          <div style="font-weight: 600;">${item.item}</div>
-          <div style="font-size: 13px; color: #666;">₱${item.price} × ${item.quantity}</div>
-        </div>
-        <div style="font-weight: 700;">₱${item.price * item.quantity}</div>
-      </div>
-    `).join('');
-    
-    confirmTotal.textContent = total.toFixed(0);
-    confirmPayment.textContent = document.getElementById('payment').value;
-    confirmCustomer.textContent = document.getElementById('customer').value || 'Walk-in';
-    
-    modal.classList.add('active');
-  }
-  
-  function closeConfirmation() {
-    document.getElementById('confirmModal').classList.remove('active');
-  }
-  
-  async function submitOrder() {
-    const confirmBtn = document.getElementById('confirmBtn');
-    const result = document.getElementById('result');
-    
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Processing...';
-    
-    const data = {
-      items: cart.map(item => ({
-        item: item.item,
-        quantity: item.quantity
-      })),
-      payment: document.getElementById('payment').value,
-      customer: document.getElementById('customer').value || 'Walk-in'
-    };
-    
-    try {
-      const response = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data)
+
+    // Save order to history
+    function saveOrderToHistory(orderData) {
+      const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
+      
+      orders.push({
+        orderNumber: orderData.orderNumber,
+        total: orderData.grandTotal,
+        customer: orderData.customer,
+        payment: orderData.payment,
+        timestamp: new Date().toLocaleString('en-PH', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        })
       });
       
-      if (!response.ok) throw new Error('Network error');
+      if (orders.length > 50) {
+        orders.shift();
+      }
       
-      const responseData = await response.json();
-      
-      // Close modal
-      closeConfirmation();
-      
-      // Save to recent orders history
-      saveOrderToHistory(responseData);
-      
-      result.className = 'result success';
-      result.innerHTML = `
-        ✅ <strong>Order Confirmed!</strong><br>
-        Order #${responseData.orderNumber}<br>
-        Total: ₱${responseData.grandTotal}
-      `;
-      
-      // Clear cart
-      cart = [];
-      updateCart();
-      document.getElementById('customer').value = '';
-      document.getElementById('payment').selectedIndex = 0;
-      
-      // Hide result after 5 seconds
-      setTimeout(() => {
-        result.style.display = 'none';
-      }, 5000);
-      
-    } catch (error) {
-      closeConfirmation();
-      result.className = 'result error';
-      result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
-    } finally {
-      confirmBtn.disabled = false;
-      confirmBtn.textContent = 'Confirm Order';
+      localStorage.setItem('recentOrders', JSON.stringify(orders));
+      loadRecentOrders();
     }
-  }
+
+    // Clear order history
+    function clearOrderHistory() {
+      if (confirm('Clear all order history?')) {
+        localStorage.removeItem('recentOrders');
+        loadRecentOrders();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadRecentOrders);
+
+    function addToCart() {
+      const itemSelect = document.getElementById('item');
+      const qtyInput = document.getElementById('qty');
+      
+      const itemName = itemSelect.value;
+      const quantity = parseInt(qtyInput.value);
+      
+      if (!itemName) {
+        alert('Please select an item');
+        return;
+      }
+      
+      if (quantity < 1) {
+        alert('Quantity must be at least 1');
+        return;
+      }
+      
+      const price = menuPrices[itemName];
+      const existingItem = cart.find(item => item.item === itemName);
+      
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({
+          item: itemName,
+          quantity: quantity,
+          price: price
+        });
+      }
+      
+      itemSelect.value = '';
+      qtyInput.value = 1;
+      updateCart();
+      calculateChange(); // Recalculate if amount tendered is already entered
+    }
+
+    function updateQuantity(itemName, change) {
+      const item = cart.find(i => i.item === itemName);
+      if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+          removeFromCart(itemName);
+        } else {
+          updateCart();
+        }
+      }
+      calculateChange(); // Recalculate change
+    }
+
+    function removeFromCart(itemName) {
+      cart = cart.filter(item => item.item !== itemName);
+      updateCart();
+      calculateChange(); // Recalculate change
+    }
+
+    function updateCart() {
+      const cartContainer = document.getElementById('cartItems');
+      const cartCount = document.getElementById('cartCount');
+      const totalElement = document.getElementById('totalAmount');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      if (cart.length === 0) {
+        cartContainer.innerHTML = '<div class="cart-empty">Cart is empty. Add items above.</div>';
+        cartCount.textContent = '0';
+        totalElement.textContent = '0';
+        submitBtn.disabled = true;
+        return;
+      }
+      
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      
+      cartContainer.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.item}</div>
+            <div class="cart-item-details">
+              ₱${item.price} × ${item.quantity} = ₱${item.price * item.quantity}
+            </div>
+          </div>
+          <div class="cart-item-actions">
+            <button class="qty-btn" onclick="updateQuantity('${item.item}', -1)">−</button>
+            <span style="font-weight: 700; min-width: 25px; text-align: center;">${item.quantity}</span>
+            <button class="qty-btn" onclick="updateQuantity('${item.item}', 1)">+</button>
+            <button class="remove-btn" onclick="removeFromCart('${item.item}')">✕</button>
+          </div>
+        </div>
+      `).join('');
+      
+      cartCount.textContent = totalItems;
+      totalElement.textContent = total.toFixed(0);
+      submitBtn.disabled = false;
+    }
+
+    function showConfirmation() {
+      if (cart.length === 0) {
+        alert('Cart is empty!');
+        return;
+      }
+      
+      const payment = document.getElementById('payment').value;
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      // Validate payment-specific fields
+      if (payment === 'Cash') {
+        const tendered = parseFloat(document.getElementById('amountTendered').value) || 0;
+        if (tendered < total) {
+          alert('Amount tendered must be at least ₱' + total);
+          return;
+        }
+      } else if (payment === 'GCash') {
+        const refNumber = document.getElementById('referenceNumber').value.trim();
+        if (!refNumber) {
+          alert('Please enter GCash reference number');
+          return;
+        }
+      }
+      
+      const modal = document.getElementById('confirmModal');
+      const confirmItems = document.getElementById('confirmItems');
+      const confirmTotal = document.getElementById('confirmTotal');
+      const confirmPayment = document.getElementById('confirmPayment');
+      const confirmPaymentDetails = document.getElementById('confirmPaymentDetails');
+      const confirmCustomer = document.getElementById('confirmCustomer');
+      const previewOrderNumber = document.getElementById('previewOrderNumber');
+      
+      previewOrderNumber.textContent = 'Pending...';
+      
+      confirmItems.innerHTML = cart.map(item => `
+        <div class="confirm-item">
+          <div>
+            <div style="font-weight: 600;">${item.item}</div>
+            <div style="font-size: 13px; color: #666;">₱${item.price} × ${item.quantity}</div>
+          </div>
+          <div style="font-weight: 700;">₱${item.price * item.quantity}</div>
+        </div>
+      `).join('');
+      
+      confirmTotal.textContent = total.toFixed(0);
+      confirmPayment.textContent = payment;
+      
+      // Show payment-specific details
+      if (payment === 'Cash') {
+        const tendered = parseFloat(document.getElementById('amountTendered').value);
+        const change = tendered - total;
+        confirmPaymentDetails.innerHTML = `Tendered: <strong>₱${tendered.toFixed(2)}</strong> • Change: <strong>₱${change.toFixed(2)}</strong>`;
+      } else {
+        const refNumber = document.getElementById('referenceNumber').value;
+        confirmPaymentDetails.innerHTML = `Ref#: <strong>${refNumber}</strong>`;
+      }
+      
+      confirmCustomer.textContent = document.getElementById('customer').value || 'Walk-in';
+      
+      modal.classList.add('active');
+    }
+
+    function closeConfirmation() {
+      document.getElementById('confirmModal').classList.remove('active');
+    }
+
+    async function submitOrder() {
+      const confirmBtn = document.getElementById('confirmBtn');
+      const result = document.getElementById('result');
+      
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing...';
+      
+      const payment = document.getElementById('payment').value;
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      const data = {
+        items: cart.map(item => ({
+          item: item.item,
+          quantity: item.quantity
+        })),
+        payment: payment,
+        customer: document.getElementById('customer').value || 'Walk-in'
+      };
+      
+      // Add payment-specific data
+      if (payment === 'Cash') {
+        const tendered = parseFloat(document.getElementById('amountTendered').value);
+        data.amountTendered = tendered;
+        data.change = tendered - total;
+      } else {
+        data.referenceNumber = document.getElementById('referenceNumber').value.trim();
+      }
+      
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) throw new Error('Network error');
+        
+        const responseData = await response.json();
+        
+        closeConfirmation();
+        saveOrderToHistory(responseData);
+        
+        result.className = 'result success';
+        result.innerHTML = `
+          ✅ <strong>Order Confirmed!</strong><br>
+          Order #${responseData.orderNumber}<br>
+          Total: ₱${responseData.grandTotal}
+        `;
+        
+        // Clear everything
+        cart = [];
+        updateCart();
+        document.getElementById('customer').value = '';
+        document.getElementById('payment').selectedIndex = 0;
+        document.getElementById('amountTendered').value = '';
+        document.getElementById('referenceNumber').value = '';
+        document.getElementById('changeDisplay').classList.remove('active');
+        togglePaymentFields();
+        
+        setTimeout(() => {
+          result.style.display = 'none';
+        }, 5000);
+        
+      } catch (error) {
+        closeConfirmation();
+        result.className = 'result error';
+        result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Order';
+      }
+    }
   </script>
 </body>
 </html>
