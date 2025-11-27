@@ -720,7 +720,7 @@
     </div>
   </div>
 
-  <script>
+<script>
     // RESTORED ORIGINAL WEBHOOK
     const WEBHOOK_URL = 'https://n8n-production-211f.up.railway.app/webhook/bangus-order';
     
@@ -1064,7 +1064,7 @@
       
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Processing...';
-      loading.style.display = 'block'; // RESTORED LOADING
+      loading.style.display = 'block'; 
       
       const payment = document.getElementById('payment').value;
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -1101,6 +1101,9 @@
         saveOrderToHistory(responseData);
         
         result.className = 'result success';
+        // FIX: Force display block to override previous "display: none" from setTimeout
+        result.style.display = 'block'; 
+        
         result.innerHTML = `
           ✅ <strong>Order Confirmed!</strong><br>
           Order #${responseData.orderNumber}<br>
@@ -1123,9 +1126,10 @@
       } catch (error) {
         closeConfirmation();
         result.className = 'result error';
+        result.style.display = 'block'; // Ensure error is also visible
         result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
       } finally {
-        loading.style.display = 'none'; // RESTORED LOADING
+        loading.style.display = 'none'; 
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Confirm Order';
       }
