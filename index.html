@@ -19,14 +19,47 @@
       color: #333;
     }
     
+    /* MAIN CONTAINER - ADAPTIVE */
     .container {
-      max-width: 450px;
+      max-width: 450px; /* Mobile Default */
       margin: 0 auto;
       background: white;
       border-radius: 20px;
       padding: 30px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      position: relative; /* For absolute positioning of spinner if needed */
+      position: relative;
+    }
+
+    /* TABLET/DESKTOP OVERRIDES */
+    @media (min-width: 768px) {
+      .container {
+        max-width: 960px; /* Wider for tablet */
+        padding: 40px;
+      }
+      
+      /* The Grid Wrapper */
+      .app-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr; /* Menu takes 60%, Cart takes 40% */
+        gap: 40px;
+        align-items: start;
+      }
+
+      /* Sticky Cart on Tablet */
+      .col-right {
+        position: sticky;
+        top: 20px;
+        background: #fdfdfd;
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid #eee;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      }
+      
+      .header {
+        grid-column: 1 / -1; /* Header spans full width */
+        margin-bottom: 40px;
+      }
     }
     
     .header {
@@ -53,13 +86,14 @@
       font-size: 14px;
     }
     
+    /* INPUTS */
     select, input[type="number"], input[type="text"] {
       width: 100%;
-      padding: 12px;
+      padding: 14px; /* Slightly larger touch target */
       border: 2px solid #e0e0e0;
       border-radius: 10px;
-      font-size: 15px;
-      margin-bottom: 15px;
+      font-size: 16px; /* Better for tablet reading */
+      margin-bottom: 20px;
       transition: all 0.3s;
       background: white;
     }
@@ -70,9 +104,10 @@
       box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
     }
     
+    /* BUTTONS */
     .add-btn {
       width: 100%;
-      padding: 14px;
+      padding: 16px;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: white;
       border: none;
@@ -82,6 +117,7 @@
       font-size: 16px;
       margin-bottom: 20px;
       transition: transform 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
     .add-btn:hover {
@@ -89,6 +125,7 @@
       box-shadow: 0 10px 20px rgba(30,60,114,0.3);
     }
     
+    /* CART STYLES */
     .cart-section {
       background: #f8f9fa;
       padding: 20px;
@@ -96,6 +133,14 @@
       margin-bottom: 20px;
     }
     
+    /* On tablet, the cart section inside the right col doesn't need gray bg */
+    @media (min-width: 768px) {
+      .cart-section {
+        background: transparent;
+        padding: 0;
+      }
+    }
+
     .cart-header {
       display: flex;
       justify-content: space-between;
@@ -125,6 +170,8 @@
       color: #999;
       padding: 30px 20px;
       font-size: 14px;
+      border: 2px dashed #e0e0e0;
+      border-radius: 10px;
     }
     
     .cart-item {
@@ -136,6 +183,7 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid #f0f0f0;
     }
     
     .cart-item-info {
@@ -207,6 +255,7 @@
       color: white;
       text-align: center;
       margin-top: 15px;
+      box-shadow: 0 5px 15px rgba(30,60,114,0.2);
     }
     
     .total-label {
@@ -226,15 +275,16 @@
     
     .submit-btn {
       width: 100%;
-      padding: 16px;
+      padding: 18px;
       background: #28a745;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 18px;
       transition: all 0.2s;
+      box-shadow: 0 4px 6px rgba(40,167,69,0.2);
     }
     
     .submit-btn:hover:not(:disabled) {
@@ -246,21 +296,30 @@
     .submit-btn:disabled {
       background: #ccc;
       cursor: not-allowed;
+      box-shadow: none;
     }
 
-    /* LOADING SPINNER RESTORED */
+    /* SPINNER (Fixed for Tablet centering) */
     .loading {
       display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.9);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      z-index: 2000;
       text-align: center;
-      padding: 30px;
     }
     
     .spinner {
       border: 4px solid #f3f3f3;
       border-top: 4px solid #2a5298;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       animation: spin 1s linear infinite;
       margin: 0 auto;
     }
@@ -293,6 +352,7 @@
       border: 2px solid #f5c6cb;
     }
     
+    /* MODALS */
     .modal {
       display: none;
       position: fixed;
@@ -316,7 +376,7 @@
       background: white;
       border-radius: 20px;
       padding: 30px;
-      max-width: 450px;
+      max-width: 500px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -458,7 +518,7 @@
       color: #2a5298;
     }
 
-    /* RESTORED DRAWER UI & SWIPE STYLES */
+    /* DRAWER UI */
     .recent-orders-drawer {
       position: fixed;
       bottom: 0;
@@ -475,13 +535,23 @@
       border-top-right-radius: 20px;
     }
     
+    /* Make drawer narrower on desktop/tablet */
+    @media (min-width: 768px) {
+      .recent-orders-drawer {
+        left: auto;
+        right: 20px;
+        width: 400px; /* Fixed width sidebar style */
+        border-radius: 20px 20px 0 0;
+      }
+    }
+    
     .recent-orders-drawer.open {
       transform: translateY(0);
     }
     
     .drawer-toggle-btn {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       background: #2a5298;
       color: white;
       border: none;
@@ -489,7 +559,7 @@
       cursor: pointer;
       font-weight: 700;
       margin-top: 15px;
-      font-size: 14px;
+      font-size: 15px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -502,7 +572,7 @@
     
     .drawer-content {
       padding: 20px;
-      max-width: 450px;
+      max-width: 100%;
       margin: 0 auto;
     }
     
@@ -547,7 +617,7 @@
       position: relative;
       overflow: hidden;
       transition: transform 0.3s, opacity 0.3s;
-      user-select: none; /* Prevent text selection while swiping */
+      user-select: none;
     }
 
     .recent-order-item.swiping {
@@ -601,86 +671,94 @@
       <p>Order System</p>
     </div>
 
-    <label for="item">Select Item</label>
-    <select id="item">
-      <option value="">-- Choose an item --</option>
-      <optgroup label="BANGUS RICE BOWLS">
-        <option value="Bangus Shanghai Bowl (6 pcs)">Bangus Shanghai Bowl (6 pcs) - ₱115</option>
-        <option value="Bangus Sisig Bowl (without egg)">Bangus Sisig Bowl (without egg) - ₱150</option>
-      </optgroup>
-      <optgroup label="SNACK">
-        <option value="Bangus Shanghai Bites (6 pcs, no rice)">Bangus Shanghai Bites (6 pcs, no rice) - ₱90</option>
-        <option value="Bangus Shanghai Dozen (12 pcs, no rice)">Bangus Shanghai Dozen (12 pcs, no rice) - ₱170</option>
-      </optgroup>
-      <optgroup label="ADD-ONS">
-        <option value="Extra Egg">Extra Egg - ₱20</option>
-        <option value="Extra Shanghai (3 pcs)">Extra Shanghai (3 pcs) - ₱45</option>
-        <option value="Extra Rice">Extra Rice - ₱25</option>
-      </optgroup>
-      <optgroup label="MIX BOWLS">
-        <option value="Breakfast Combo">Breakfast Combo - ₱130</option>
-        <option value="Lechon Kawali Bowl">Lechon Kawali Bowl - ₱130</option>
-      </optgroup>
-    </select>
+    <div class="app-layout">
+      
+      <div class="col-left">
+        <label for="item">Select Item</label>
+        <select id="item">
+          <option value="">-- Choose an item --</option>
+          <optgroup label="BANGUS RICE BOWLS">
+            <option value="Bangus Shanghai Bowl (6 pcs)">Bangus Shanghai Bowl (6 pcs) - ₱115</option>
+            <option value="Bangus Sisig Bowl (without egg)">Bangus Sisig Bowl (without egg) - ₱150</option>
+          </optgroup>
+          <optgroup label="SNACK">
+            <option value="Bangus Shanghai Bites (6 pcs, no rice)">Bangus Shanghai Bites (6 pcs, no rice) - ₱90</option>
+            <option value="Bangus Shanghai Dozen (12 pcs, no rice)">Bangus Shanghai Dozen (12 pcs, no rice) - ₱170</option>
+          </optgroup>
+          <optgroup label="ADD-ONS">
+            <option value="Extra Egg">Extra Egg - ₱20</option>
+            <option value="Extra Shanghai (3 pcs)">Extra Shanghai (3 pcs) - ₱45</option>
+            <option value="Extra Rice">Extra Rice - ₱25</option>
+          </optgroup>
+          <optgroup label="MIX BOWLS">
+            <option value="Breakfast Combo">Breakfast Combo - ₱130</option>
+            <option value="Lechon Kawali Bowl">Lechon Kawali Bowl - ₱130</option>
+          </optgroup>
+        </select>
 
-    <label for="qty">Quantity</label>
-    <input type="number" id="qty" value="1" min="1">
+        <label for="qty">Quantity</label>
+        <input type="number" id="qty" value="1" min="1">
 
-    <button class="add-btn" onclick="addToCart()">➕ Add to Cart</button>
-
-    <div class="cart-section">
-      <div class="cart-header">
-        <span class="cart-title">🛒 Cart</span>
-        <span class="cart-count" id="cartCount">0</span>
+        <button class="add-btn" onclick="addToCart()">➕ Add to Cart</button>
       </div>
-      <div id="cartItems">
-        <div class="cart-empty">Cart is empty. Add items above.</div>
-      </div>
-      <div class="total-section">
-        <div class="total-label">Total Amount</div>
-        <div class="total-amount">₱<span id="totalAmount">0</span></div>
-      </div>
-    </div>
 
-    <div class="checkout-section">
-      <label for="customer">Customer Name (Optional)</label>
-      <input type="text" id="customer" placeholder="e.g., Juan Dela Cruz">
-
-      <label for="payment">Payment Method</label>
-      <select id="payment" onchange="togglePaymentFields()">
-        <option value="Cash">Cash</option>
-        <option value="GCash">GCash</option>
-      </select>
-
-      <div id="cashFields" class="payment-fields active">
-        <label for="amountTendered">Amount Tendered</label>
-        <input type="number" id="amountTendered" placeholder="Enter amount" step="0.01" oninput="calculateChange()">
-        
-        <div id="changeDisplay" class="change-display">
-          <div class="change-label">Change</div>
-          <div class="change-amount">₱<span id="changeAmount">0.00</span></div>
+      <div class="col-right">
+        <div class="cart-section">
+          <div class="cart-header">
+            <span class="cart-title">🛒 Cart</span>
+            <span class="cart-count" id="cartCount">0</span>
+          </div>
+          <div id="cartItems">
+            <div class="cart-empty">Cart is empty. Add items.</div>
+          </div>
+          <div class="total-section">
+            <div class="total-label">Total Amount</div>
+            <div class="total-amount">₱<span id="totalAmount">0</span></div>
+          </div>
         </div>
+
+        <div class="checkout-section">
+          <label for="customer">Customer Name (Optional)</label>
+          <input type="text" id="customer" placeholder="e.g., Juan Dela Cruz">
+
+          <label for="payment">Payment Method</label>
+          <select id="payment" onchange="togglePaymentFields()">
+            <option value="Cash">Cash</option>
+            <option value="GCash">GCash</option>
+          </select>
+
+          <div id="cashFields" class="payment-fields active">
+            <label for="amountTendered">Amount Tendered</label>
+            <input type="number" id="amountTendered" placeholder="Enter amount" step="0.01" oninput="calculateChange()">
+            
+            <div id="changeDisplay" class="change-display">
+              <div class="change-label">Change</div>
+              <div class="change-amount">₱<span id="changeAmount">0.00</span></div>
+            </div>
+          </div>
+
+          <div id="gcashFields" class="payment-fields">
+            <label for="referenceNumber">GCash Reference Number</label>
+            <input type="text" id="referenceNumber" placeholder="Enter reference number">
+          </div>
+
+          <button class="submit-btn" id="submitBtn" onclick="showConfirmation()" disabled>
+            🧾 Submit Order
+          </button>
+
+          <button class="drawer-toggle-btn" onclick="toggleDrawer()">
+            📋 View Recent Orders
+          </button>
+        </div>
+        
+        <div id="result" class="result"></div>
       </div>
-
-      <div id="gcashFields" class="payment-fields">
-        <label for="referenceNumber">GCash Reference Number</label>
-        <input type="text" id="referenceNumber" placeholder="Enter reference number">
-      </div>
-
-      <button class="submit-btn" id="submitBtn" onclick="showConfirmation()" disabled>
-        🧾 Submit Order
-      </button>
-
-      <button class="drawer-toggle-btn" onclick="toggleDrawer()">
-        📋 View Recent Orders
-      </button>
     </div>
+  </div>
 
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-    </div>
-
-    <div id="result" class="result"></div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div style="margin-top: 10px; color: #2a5298; font-weight: 600;">Processing...</div>
   </div>
 
   <div class="recent-orders-drawer" id="recentOrdersDrawer">
@@ -720,32 +798,23 @@
     </div>
   </div>
 
-<script>
-    // RESTORED ORIGINAL WEBHOOK
+  <script>
     const WEBHOOK_URL = 'https://n8n-production-211f.up.railway.app/webhook/bangus-order';
     
     const menuPrices = {
-      // BANGUS RICE BOWLS
       'Bangus Shanghai Bowl (6 pcs)': 115,
       'Bangus Sisig Bowl (without egg)': 150,
-      
-      // SNACK
       'Bangus Shanghai Bites (6 pcs, no rice)': 90,
       'Bangus Shanghai Dozen (12 pcs, no rice)': 170,
-      
-      // ADD-ONS
       'Extra Egg': 20,
       'Extra Shanghai (3 pcs)': 45,
       'Extra Rice': 25,
-      
-      // MIX BOWLS
       'Breakfast Combo': 130,
       'Lechon Kawali Bowl': 130
     };
     
     let cart = [];
 
-    // RESTORED DRAWER TOGGLE
     function toggleDrawer() {
       const drawer = document.getElementById('recentOrdersDrawer');
       drawer.classList.toggle('open');
@@ -809,15 +878,13 @@
       if (!currentSwipeElement) return;
       
       const diff = touchEndX - touchStartX;
-      const threshold = -100; // Swipe threshold in pixels
+      const threshold = -100; 
       
       element.classList.remove('swiping');
       
       if (diff < threshold) {
-        // Delete the order
         deleteOrder(orderNumber, element);
       } else {
-        // Reset position
         element.style.transform = 'translateX(0)';
       }
       
@@ -837,7 +904,6 @@
       }, 300);
     }
 
-    // Load recent orders with swipe functionality
     function loadRecentOrders() {
       const container = document.getElementById('recentOrdersContainer');
       const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
@@ -871,7 +937,6 @@
       `).join('');
     }
 
-    // Save order to history
     function saveOrderToHistory(orderData) {
       const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
       
@@ -961,7 +1026,7 @@
       const submitBtn = document.getElementById('submitBtn');
       
       if (cart.length === 0) {
-        cartContainer.innerHTML = '<div class="cart-empty">Cart is empty. Add items above.</div>';
+        cartContainer.innerHTML = '<div class="cart-empty">Cart is empty. Add items.</div>';
         cartCount.textContent = '0';
         totalElement.textContent = '0';
         submitBtn.disabled = true;
@@ -1101,8 +1166,7 @@
         saveOrderToHistory(responseData);
         
         result.className = 'result success';
-        // FIX: Force display block to override previous "display: none" from setTimeout
-        result.style.display = 'block'; 
+        result.style.display = 'block';
         
         result.innerHTML = `
           ✅ <strong>Order Confirmed!</strong><br>
@@ -1126,7 +1190,7 @@
       } catch (error) {
         closeConfirmation();
         result.className = 'result error';
-        result.style.display = 'block'; // Ensure error is also visible
+        result.style.display = 'block';
         result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
       } finally {
         loading.style.display = 'none'; 
