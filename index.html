@@ -983,7 +983,14 @@
         return;
       }
       
+      // PRICE CHECK ADDED HERE to prevent NaN errors
       const price = menuPrices[itemName];
+      if (typeof price === 'undefined') {
+        alert('Error: Price not found for this item. Please contact admin.');
+        console.error('Missing price for:', itemName);
+        return;
+      }
+      
       const existingItem = cart.find(item => item.item === itemName);
       
       if (existingItem) {
@@ -1136,11 +1143,13 @@
       const payment = document.getElementById('payment').value;
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       
+      // ADDED grandTotal explicitly here
       const data = {
         items: cart.map(item => ({
           item: item.item,
           quantity: item.quantity
         })),
+        grandTotal: total, // Ensures backend gets the calculated total
         payment: payment,
         customer: document.getElementById('customer').value || 'Walk-in'
       };
@@ -1148,7 +1157,10 @@
       if (payment === 'Cash') {
         const tendered = parseFloat(document.getElementById('amountTendered').value);
         data.amountTendered = tendered;
-        data.change = tendered - total;
+        
+        // FIXED calculation logic to prevent null
+        const changeVal = tendered - total;
+        data.change = isNaN(changeVal) ? 0 : changeVal;
       } else {
         data.referenceNumber = document.getElementById('referenceNumber').value.trim();
       }
