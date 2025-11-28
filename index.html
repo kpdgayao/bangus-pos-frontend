@@ -1584,7 +1584,12 @@
         const responseData = await response.json();
         
         closeConfirmation();
-        saveOrderToHistory(responseData);
+
+        // Save order with items from current cart (backend may not return items)
+        saveOrderToHistory({
+          ...responseData,
+          items: cart.map(item => ({ item: item.item, quantity: item.quantity }))
+        });
 
         result.className = 'result success success-pop';
         result.style.display = 'block';
