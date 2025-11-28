@@ -785,6 +785,127 @@
       font-size: 12px;
       pointer-events: none;
     }
+
+    /* VISUAL FEEDBACK ANIMATIONS */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes successPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
+    .pulse {
+      animation: pulse 0.3s ease-in-out;
+    }
+
+    .slide-in {
+      animation: slideInRight 0.3s ease-out;
+    }
+
+    .success-pop {
+      animation: successPop 0.4s ease-out;
+    }
+
+    /* QUICK QUANTITY BUTTONS */
+    .qty-quick-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .qty-quick-btn {
+      flex: 1;
+      min-width: 60px;
+      padding: 10px;
+      background: #f0f0f0;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: #555;
+      transition: all 0.2s;
+    }
+
+    .qty-quick-btn:hover {
+      background: #e8e8e8;
+      border-color: #2a5298;
+      color: #2a5298;
+      transform: translateY(-1px);
+    }
+
+    .qty-quick-btn.active {
+      background: #2a5298;
+      color: white;
+      border-color: #2a5298;
+    }
+
+    /* CLEAR CART BUTTON */
+    .clear-cart-btn {
+      width: 100%;
+      padding: 12px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+
+    .clear-cart-btn:hover {
+      background: #5a6268;
+      transform: translateY(-1px);
+    }
+
+    /* REORDER BUTTON IN DRAWER */
+    .reorder-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 8px;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .reorder-btn:hover {
+      background: #218838;
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
@@ -823,7 +944,14 @@
         <label for="qty">Quantity</label>
         <input type="number" id="qty" value="1" min="1">
 
-        <button class="add-btn" onclick="addToCart()">➕ Add to Cart</button>
+        <div class="qty-quick-buttons">
+          <button class="qty-quick-btn active" onclick="setQuantity(1)">×1</button>
+          <button class="qty-quick-btn" onclick="setQuantity(2)">×2</button>
+          <button class="qty-quick-btn" onclick="setQuantity(3)">×3</button>
+          <button class="qty-quick-btn" onclick="setQuantity(5)">×5</button>
+        </div>
+
+        <button class="add-btn" id="addToCartBtn" onclick="addToCart()">➕ Add to Cart</button>
       </div>
 
       <div class="col-right">
@@ -835,6 +963,7 @@
           <div id="cartItems">
             <div class="cart-empty">Cart is empty. Add items.</div>
           </div>
+          <button class="clear-cart-btn" id="clearCartBtn" onclick="clearCart()" style="display: none;">🗑️ Clear All Items</button>
           <div class="total-section">
             <div class="total-label">Total Amount</div>
             <div class="total-amount">₱<span id="totalAmount">0</span></div>
@@ -924,7 +1053,40 @@
 
   <script>
     const WEBHOOK_URL = 'https://n8n-production-211f.up.railway.app/webhook/bangus-order';
-    
+
+    // AUDIO FEEDBACK
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(frequency, duration, type = 'sine') {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = frequency;
+      oscillator.type = type;
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playAddToCartSound() {
+      playSound(800, 0.1);
+    }
+
+    function playSuccessSound() {
+      playSound(600, 0.1);
+      setTimeout(() => playSound(800, 0.15), 100);
+    }
+
+    function playErrorSound() {
+      playSound(200, 0.2);
+    }
+
     const menuPrices = {
       'Bangus Shanghai Bowl (6 pcs)': 115,
       'Bangus Sisig Bowl (without egg)': 150,
@@ -939,6 +1101,56 @@
     };
     
     let cart = [];
+
+    // QUICK QUANTITY BUTTONS
+    function setQuantity(qty) {
+      const qtyInput = document.getElementById('qty');
+      qtyInput.value = qty;
+
+      // Update button styles
+      document.querySelectorAll('.qty-quick-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+
+    // CLEAR CART FUNCTION
+    function clearCart() {
+      if (cart.length === 0) return;
+
+      if (confirm('Clear all items from cart?')) {
+        cart = [];
+        updateCart();
+        playSound(400, 0.1);
+      }
+    }
+
+    // KEYBOARD SHORTCUTS
+    document.addEventListener('keydown', function(e) {
+      // Escape key - close modals/drawer
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('confirmModal');
+        const drawer = document.getElementById('recentOrdersDrawer');
+
+        if (modal.classList.contains('active')) {
+          closeConfirmation();
+        } else if (drawer.classList.contains('open')) {
+          toggleDrawer();
+        }
+      }
+
+      // Enter key on item dropdown - add to cart
+      if (e.key === 'Enter' && document.activeElement.id === 'item') {
+        e.preventDefault();
+        addToCart();
+      }
+
+      // Ctrl/Cmd + K - focus item dropdown
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('item').focus();
+      }
+    });
 
     function toggleDrawer() {
       const drawer = document.getElementById('recentOrdersDrawer');
@@ -1032,16 +1244,16 @@
     function loadRecentOrders() {
       const container = document.getElementById('recentOrdersContainer');
       const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
-      
+
       if (orders.length === 0) {
         container.innerHTML = '<div class="recent-orders-empty">No orders yet</div>';
         return;
       }
-      
+
       const recentOrders = orders.slice(-20).reverse();
-      
+
       container.innerHTML = recentOrders.map(order => `
-        <div class="recent-order-item" 
+        <div class="recent-order-item"
              data-order-number="${order.orderNumber}"
              ontouchstart="handleSwipeStart(event, this)"
              ontouchmove="handleSwipeMove(event, this)"
@@ -1057,19 +1269,67 @@
           <div class="recent-order-details">
             ${order.customer} • ${order.payment} • ${order.timestamp}
           </div>
+          <button class="reorder-btn" onclick="reorderFromHistory('${order.orderNumber}'); event.stopPropagation();">🔄 Reorder</button>
           <div class="swipe-indicator">← Swipe to delete</div>
         </div>
       `).join('');
     }
 
+    // REORDER FROM HISTORY
+    function reorderFromHistory(orderNumber) {
+      const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
+      const order = orders.find(o => o.orderNumber === orderNumber);
+
+      if (!order || !order.items) {
+        alert('Cannot reorder: order details not found');
+        playErrorSound();
+        return;
+      }
+
+      // Add each item from the order to cart
+      order.items.forEach(item => {
+        const price = menuPrices[item.item];
+        if (typeof price === 'undefined') {
+          console.error('Missing price for:', item.item);
+          return;
+        }
+
+        const existingItem = cart.find(cartItem => cartItem.item === item.item);
+
+        if (existingItem) {
+          existingItem.quantity += item.quantity;
+        } else {
+          cart.push({
+            item: item.item,
+            quantity: item.quantity,
+            price: price
+          });
+        }
+      });
+
+      updateCart();
+      playSuccessSound();
+
+      // Visual feedback
+      const addBtn = document.getElementById('addToCartBtn');
+      addBtn.classList.add('pulse');
+      setTimeout(() => addBtn.classList.remove('pulse'), 300);
+
+      // Close drawer
+      toggleDrawer();
+
+      alert(`Reordered ${order.items.length} item(s) from ${orderNumber}`);
+    }
+
     function saveOrderToHistory(orderData) {
       const orders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
-      
+
       orders.push({
         orderNumber: orderData.orderNumber,
         total: orderData.grandTotal,
         customer: orderData.customer,
         payment: orderData.payment,
+        items: orderData.items || [], // Save items for reorder functionality
         timestamp: new Date().toLocaleString('en-PH', {
           month: 'short',
           day: 'numeric',
@@ -1092,30 +1352,38 @@
     function addToCart() {
       const itemSelect = document.getElementById('item');
       const qtyInput = document.getElementById('qty');
-      
+
       const itemName = itemSelect.value;
       const quantity = parseInt(qtyInput.value);
-      
+
       if (!itemName) {
         alert('Please select an item');
+        playErrorSound();
+        // Shake animation on dropdown
+        itemSelect.classList.add('shake');
+        setTimeout(() => itemSelect.classList.remove('shake'), 500);
         return;
       }
-      
+
       if (quantity < 1) {
         alert('Quantity must be at least 1');
+        playErrorSound();
+        qtyInput.classList.add('shake');
+        setTimeout(() => qtyInput.classList.remove('shake'), 500);
         return;
       }
-      
+
       // PRICE CHECK ADDED HERE to prevent NaN errors
       const price = menuPrices[itemName];
       if (typeof price === 'undefined') {
         alert('Error: Price not found for this item. Please contact admin.');
         console.error('Missing price for:', itemName);
+        playErrorSound();
         return;
       }
-      
+
       const existingItem = cart.find(item => item.item === itemName);
-      
+
       if (existingItem) {
         existingItem.quantity += quantity;
       } else {
@@ -1125,9 +1393,20 @@
           price: price
         });
       }
-      
+
+      // Audio and visual feedback
+      playAddToCartSound();
+      const addBtn = document.getElementById('addToCartBtn');
+      addBtn.classList.add('pulse');
+      setTimeout(() => addBtn.classList.remove('pulse'), 300);
+
       itemSelect.value = '';
       qtyInput.value = 1;
+
+      // Reset quantity buttons
+      document.querySelectorAll('.qty-quick-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('.qty-quick-btn').classList.add('active'); // Activate ×1
+
       updateCart();
       calculateChange();
     }
@@ -1156,14 +1435,19 @@
       const cartCount = document.getElementById('cartCount');
       const totalElement = document.getElementById('totalAmount');
       const submitBtn = document.getElementById('submitBtn');
-      
+      const clearCartBtn = document.getElementById('clearCartBtn');
+
       if (cart.length === 0) {
         cartContainer.innerHTML = '<div class="cart-empty">Cart is empty. Add items.</div>';
         cartCount.textContent = '0';
         totalElement.textContent = '0';
         submitBtn.disabled = true;
+        clearCartBtn.style.display = 'none';
         return;
       }
+
+      // Show clear cart button when there are items
+      clearCartBtn.style.display = 'block';
       
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -1301,16 +1585,19 @@
         
         closeConfirmation();
         saveOrderToHistory(responseData);
-        
-        result.className = 'result success';
+
+        result.className = 'result success success-pop';
         result.style.display = 'block';
-        
+
         result.innerHTML = `
           ✅ <strong>Order Confirmed!</strong><br>
           Order #${responseData.orderNumber}<br>
           Total: ₱${responseData.grandTotal}
         `;
-        
+
+        // Play success sound
+        playSuccessSound();
+
         cart = [];
         updateCart();
         document.getElementById('customer').value = '';
@@ -1326,9 +1613,10 @@
         
       } catch (error) {
         closeConfirmation();
-        result.className = 'result error';
+        result.className = 'result error shake';
         result.style.display = 'block';
         result.innerHTML = `❌ <strong>Order Failed</strong><br>${error.message}`;
+        playErrorSound();
       } finally {
         loading.style.display = 'none'; 
         confirmBtn.disabled = false;
