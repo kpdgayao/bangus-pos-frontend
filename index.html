@@ -15,33 +15,83 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       min-height: 100vh;
-      padding: 20px;
+      padding: 10px;
       color: #333;
     }
     
     /* MAIN CONTAINER - ADAPTIVE */
     .container {
-      max-width: 450px; /* Mobile Default */
+      max-width: 100%; /* Mobile Default */
       margin: 0 auto;
       background: white;
-      border-radius: 20px;
-      padding: 30px;
+      border-radius: 15px;
+      padding: 20px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       position: relative;
     }
 
-    /* TABLET/DESKTOP OVERRIDES */
-    @media (min-width: 768px) {
+    /* SMALL PHONE ADJUSTMENTS */
+    @media (max-width: 374px) {
       .container {
-        max-width: 960px; /* Wider for tablet */
-        padding: 40px;
+        padding: 15px;
+        border-radius: 12px;
       }
-      
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      body {
+        padding: 8px;
+      }
+    }
+
+    /* PHONE/PHABLET (375px - 767px) - Keep single column */
+    @media (min-width: 375px) {
+      .container {
+        max-width: 450px;
+        padding: 25px;
+      }
+
+      .header h1 {
+        font-size: 26px;
+      }
+    }
+
+    /* TABLET PORTRAIT (768px - 899px) - Single column, wider container */
+    @media (min-width: 768px) {
+      body {
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 720px;
+        padding: 30px;
+        border-radius: 18px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+      }
+
+      /* Keep single column layout for portrait tablets */
+      .app-layout {
+        display: block;
+      }
+    }
+
+    /* LARGE TABLET/LANDSCAPE (900px - 1023px) - Enable grid layout */
+    @media (min-width: 900px) {
+      .container {
+        max-width: 850px;
+        padding: 35px;
+      }
+
       /* The Grid Wrapper */
       .app-layout {
         display: grid;
         grid-template-columns: 1.2fr 0.8fr; /* Menu takes 60%, Cart takes 40% */
-        gap: 40px;
+        gap: 30px;
         align-items: start;
       }
 
@@ -55,10 +105,39 @@
         border: 1px solid #eee;
         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
       }
-      
+
       .header {
         grid-column: 1 / -1; /* Header spans full width */
+        margin-bottom: 35px;
+      }
+
+      .header h1 {
+        font-size: 30px;
+      }
+    }
+
+    /* DESKTOP (1024px+) - Maximum width and spacing */
+    @media (min-width: 1024px) {
+      body {
+        padding: 30px;
+      }
+
+      .container {
+        max-width: 1000px;
+        padding: 40px;
+        border-radius: 20px;
+      }
+
+      .app-layout {
+        gap: 40px;
+      }
+
+      .header {
         margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 32px;
       }
     }
     
@@ -68,7 +147,7 @@
     }
     
     .header h1 {
-      font-size: 28px;
+      font-size: 24px;
       color: #1e3c72;
       margin-bottom: 5px;
     }
@@ -133,8 +212,8 @@
       margin-bottom: 20px;
     }
     
-    /* On tablet, the cart section inside the right col doesn't need gray bg */
-    @media (min-width: 768px) {
+    /* On large tablet/desktop, the cart section inside the right col doesn't need gray bg */
+    @media (min-width: 900px) {
       .cart-section {
         background: transparent;
         padding: 0;
@@ -212,11 +291,11 @@
       background: #2a5298;
       color: white;
       border: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -232,11 +311,11 @@
       background: #dc3545;
       color: white;
       border: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -363,7 +442,7 @@
       background: rgba(0,0,0,0.5);
       z-index: 1000;
       overflow-y: auto;
-      padding: 20px;
+      padding: 15px;
     }
     
     .modal.active {
@@ -374,13 +453,39 @@
     
     .modal-content {
       background: white;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 500px;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 95%;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    /* Modal responsive sizing */
+    @media (min-width: 480px) {
+      .modal-content {
+        max-width: 450px;
+        padding: 25px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .modal {
+        padding: 20px;
+      }
+
+      .modal-content {
+        max-width: 500px;
+        padding: 30px;
+        border-radius: 20px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .modal-content {
+        max-width: 550px;
+      }
     }
     
     .modal-header {
@@ -535,12 +640,30 @@
       border-top-right-radius: 20px;
     }
     
-    /* Make drawer narrower on desktop/tablet */
-    @media (min-width: 768px) {
+    /* Make drawer responsive across devices */
+    @media (min-width: 768px) and (max-width: 899px) {
       .recent-orders-drawer {
         left: auto;
         right: 20px;
-        width: 400px; /* Fixed width sidebar style */
+        width: 350px; /* Narrower for tablet portrait */
+        border-radius: 20px 20px 0 0;
+      }
+    }
+
+    @media (min-width: 900px) and (max-width: 1023px) {
+      .recent-orders-drawer {
+        left: auto;
+        right: 20px;
+        width: 400px; /* Medium width for large tablets */
+        border-radius: 20px 20px 0 0;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .recent-orders-drawer {
+        left: auto;
+        right: 20px;
+        width: 450px; /* Wider for desktop */
         border-radius: 20px 20px 0 0;
       }
     }
